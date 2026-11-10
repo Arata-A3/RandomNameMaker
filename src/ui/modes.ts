@@ -24,33 +24,61 @@ interface LayoutOptions {
   submitLabel: string;
   /** 「くわしい設定」にしまう項目 */
   advanced?: HTMLElement[];
+  /** 条件を閉じているときに見せる、いまの条件の要約 */
+  summary: () => string;
 }
 
 let formSeq = 0;
 const isPhone = () => window.matchMedia('(max-width: 720px)').matches;
 
+/** 選んだもののラベルを「・」でつなぐ（多いときは数だけ） */
+export function labelsOf<T extends string>(all: { id: T; label: string }[], picked: T[], max = 3): string {
+  const labels = all.filter((x) => picked.includes(x.id)).map((x) => x.label);
+  if (labels.length === 0) return 'なし';
+  if (labels.length === all.length) return 'すべて';
+  return labels.length > max ? `${labels.length}種類` : labels.join('・');
+}
+
+export function labelOf<T extends string>(all: { id: T; label: string }[], id: T): string {
+  return all.find((x) => x.id === id)?.label ?? '';
+}
+
 /**
  * 共通の枠: 左に和紙の条件、右に結果。
- * スマホでは主ボタンを画面下（タブの上）に固定して、押したら結果まで送る。
+ * スマホでは条件を畳める（畳むと要約の1行だけ）。主ボタンは画面下（タブの上）に固定して、
+ * 押したら条件を畳んで結果まで送る。
  */
 export function layout(form: HTMLElement[], onGenerate: () => void, results: HTMLElement, o: LayoutOptions): HTMLElement {
   const formId = `options-${++formSeq}`;
+  const bodyId = `${formId}-body`;
   const output = h('section', { class: 'output', 'aria-live': 'polite' }, results);
-  return h(
-    'div',
-    { class: 'mode' },
-    h(
-      'form',
-      {
-        id: formId,
-        class: 'options washi',
-        onsubmit: (e: Event) => {
-          e.preventDefault();
-          onGenerate();
-          if (isPhone()) output.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        },
+  const summary = h('span', { class: 'options-summary' });
+  const toggleLabel = h('span', {});
+  const toggle = h(
+    'button',
+    { type: 'button', class: 'options-toggle', 'aria-controls': bodyId, onclick: () => setOpen(!formEl.classList.contains('open')) },
+    h('span', { class: 'options-title' }, '条件'),
+    summary,
+    h('span', { class: 'options-toggle-label' }, toggleLabel, icon('chevron', 16)),
+  );
+  const formEl = h(
+    'form',
+    {
+      id: formId,
+      class: 'options washi',
+      onsubmit: (e: Event) => {
+        e.preventDefault();
+        onGenerate();
+        if (isPhone()) {
+          setOpen(false);
+          output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       },
-      h('h2', { class: 'options-title' }, '条件'),
+    },
+    h('h2', { class: 'options-head' }, toggle),
+    h(
+      'div',
+      { class: 'options-body', id: bodyId },
       form,
       o.advanced?.length
         ? h('details', { class: 'advanced' }, h('summary', {}, icon('chevron', 16), 'くわしい設定'), h('div', { class: 'advanced-body' }, o.advanced))
@@ -63,6 +91,19 @@ export function layout(form: HTMLElement[], onGenerate: () => void, results: HTM
         h('kbd', {}, 'Enter'),
       ),
     ),
+  );
+  function setOpen(open: boolean) {
+    formEl.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggleLabel.textContent = open ? '閉じる' : '変える';
+    summary.textContent = o.summary();
+    save('optionsOpen', open);
+  }
+  setOpen(load('optionsOpen', false));
+  return h(
+    'div',
+    { class: 'mode' },
+    formEl,
     output,
     // スマホ用: 親指の届く位置に固定した主ボタン
     h('div', { class: 'cta-bar' }, h('button', { type: 'submit', form: formId, class: 'primary wood-walnut' }, icon('dice', 22), o.submitLabel)),
@@ -132,8 +173,19 @@ export function stringMode(): HTMLElement {
     ),
   ];
   run();
-  return layout(form, run, results, { submitLabel: '文字列を作る', advanced: [seedField(o.seed, (v) => (o.seed = v))] });
+  return layout(form, run, results, {
+    submitLabel: '文字列を作る',
+    advanced: [seedField(o.seed, (v) => (o.seed = v))],
+    summary: () =>
+      `${labelsOf(CHARSETS, o.charsets)}・${o.minLength === o.maxLength ? o.minLength : `${o.minLength}〜${o.maxLength}`}文字・${o.count}個`,
+  });
 }
+
+const GENDERS: { id: NameGender; label: string }[] = [
+  { id: 'any', label: 'どちらも' },
+  { id: 'male', label: '男性' },
+  { id: 'female', label: '女性' },
+];
 
 export function nameMode(): HTMLElement {
   const o: NameOptions = load('opt:name', DEFAULT_NAME_OPTIONS);
@@ -152,11 +204,7 @@ export function nameMode(): HTMLElement {
     field(
       '性別',
       segmented<NameGender>(
-        [
-          { id: 'any', label: 'どちらも' },
-          { id: 'male', label: '男性' },
-          { id: 'female', label: '女性' },
-        ],
+        GENDERS,
         o.gender,
         (v) => (o.gender = v),
         '性別',
@@ -195,7 +243,11 @@ export function nameMode(): HTMLElement {
     seedField(o.seed, (v) => (o.seed = v)),
   ];
   run();
-  return layout(form, run, results, { submitLabel: '名札を作る', advanced });
+  return layout(form, run, results, {
+    submitLabel: '名札を作る',
+    advanced,
+    summary: () => `${labelOf(CULTURES, o.culture)}・${labelOf(GENDERS, o.gender)}・${o.count}個`,
+  });
 }
 
 export function wordMode(): HTMLElement {
@@ -232,5 +284,9 @@ export function wordMode(): HTMLElement {
     field('いくつ作るか', numberInput(o.count, 1, (v) => (o.count = v), MAX_COUNT, '作る数')),
   ];
   run();
-  return layout(form, run, results, { submitLabel: '言葉を作る', advanced: [seedField(o.seed, (v) => (o.seed = v))] });
+  return layout(form, run, results, {
+    submitLabel: '言葉を作る',
+    advanced: [seedField(o.seed, (v) => (o.seed = v))],
+    summary: () => `${labelsOf(WORD_CATEGORIES, o.categories)}・${o.count}個`,
+  });
 }

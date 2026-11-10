@@ -3,7 +3,7 @@ import { field, h, numberInput, segmented } from './dom';
 import { icon } from './icons';
 import { load, save } from './store';
 import { copyButton, favButton, resultsBar } from './results';
-import { layout, seedField } from './modes';
+import { labelOf, layout, seedField } from './modes';
 import { drawYonkoma, shareButtons } from './share';
 import { Rng } from '../core/random';
 import { CULTURES } from '../generators/name';
@@ -187,5 +187,9 @@ export function yonkomaMode(): HTMLElement {
     field('名前の国風', segmented(CULTURES, o.culture, (v) => (o.culture = v), '名前の国風')),
   ];
   render();
-  return layout(form, run, results, { submitLabel: 'ネタを引く', advanced: [seedField(o.seed, (v) => (o.seed = v))] });
+  return layout(form, run, results, {
+    submitLabel: 'ネタを引く',
+    advanced: [seedField(o.seed, (v) => (o.seed = v))],
+    summary: () => `${labelOf(GENRES, o.genre ?? 'any')}・${o.characterCount}人・${labelOf(CULTURES, o.culture)}`,
+  });
 }
