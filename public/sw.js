@@ -1,7 +1,7 @@
 // オフラインでも使えるようにするサービスワーカー
 // - ページ（HTML）: まずネットから取り、つながらなければ保存しておいたものを出す
 // - JS・CSS・画像・フォント: 保存したものをすぐ出し、裏で新しいものに入れ替える
-const CACHE = 'rnm-v1';
+const CACHE = 'rnm-v2';
 const CORE = ['./', './index.html', './manifest.webmanifest', './favicon.svg', './icons/icon-192.png'];
 
 self.addEventListener('install', (event) => {
