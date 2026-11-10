@@ -1,4 +1,5 @@
 {
+  "id": "./?app=randomnamemaker",
   "name": "RandomNameMaker",
   "short_name": "名前メーカー",
   "description": "名前・文字列・言葉・4コマのネタをランダムに作るツール",

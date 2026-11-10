@@ -1,7 +1,7 @@
 // オフラインでも使えるようにするサービスワーカー
-// - ページ（HTML）: まずネットから取り、つながらなければ保存しておいたものを出す
+// - ページ（HTML）とマニフェスト: まずネットから取り、つながらなければ保存しておいたものを出す
 // - JS・CSS・画像・フォント: 保存したものをすぐ出し、裏で新しいものに入れ替える
-const CACHE = 'rnm-v2';
+const CACHE = 'rnm-v3';
 const CORE = ['./', './index.html', './manifest.webmanifest', './favicon.svg', './icons/icon-192.png'];
 
 self.addEventListener('install', (event) => {
@@ -34,6 +34,20 @@ self.addEventListener('fetch', (event) => {
           return res;
         })
         .catch(() => caches.match('./index.html')),
+    );
+    return;
+  }
+
+  // マニフェストは古いものを出すとインストールの判定がずれるので、いつも新しいものを使う
+  if (sameOrigin && url.pathname.endsWith('.webmanifest')) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, copy));
+          return res;
+        })
+        .catch(() => caches.match(req)),
     );
     return;
   }
