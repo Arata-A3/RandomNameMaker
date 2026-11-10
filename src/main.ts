@@ -5,6 +5,7 @@ import { load, save } from './ui/store';
 import { nameMode, stringMode, wordMode } from './ui/modes';
 import { yonkomaMode } from './ui/yonkomaMode';
 import { favoritesView } from './ui/favoritesView';
+import { readShare, showSharedDialog } from './ui/share';
 
 type Tab = 'string' | 'name' | 'word' | 'yonkoma' | 'favorites';
 
@@ -64,6 +65,12 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
       /* 登録できなくても普通に使える */
     });
   });
+}
+
+// 共有リンクで開かれたら、共有された名札を先に見せる
+const shared = readShare(location.hash);
+if (shared) {
+  showSharedDialog(shared, () => history.replaceState(null, '', location.pathname + location.search));
 }
 
 const saved = load<Tab>('tab', 'name');

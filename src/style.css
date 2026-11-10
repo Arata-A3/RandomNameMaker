@@ -945,3 +945,33 @@ label {
     z-index: 30;
   }
 }
+
+/* 共有リンクで開いたときの画面 */
+dialog.shared {
+  border: 0;
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 24px;
+  color: var(--ink);
+}
+
+dialog.shared::backdrop {
+  background: rgba(30, 15, 5, 0.55);
+}
+
+dialog.shared h2 {
+  margin: 0;
+  font-family: var(--font-name);
+  font-weight: 800;
+  font-size: 1.4rem;
+}
+
+dialog.shared .hint {
+  margin: 4px 0 16px;
+}
+
+dialog.shared .primary {
+  width: 100%;
+  margin-top: 20px;
+}

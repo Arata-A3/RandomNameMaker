@@ -4,6 +4,7 @@ import { icon } from './icons';
 import { load, save } from './store';
 import { copyButton, favButton, resultsBar } from './results';
 import { layout, seedField } from './modes';
+import { drawYonkoma, shareButtons } from './share';
 import { Rng } from '../core/random';
 import { CULTURES } from '../generators/name';
 import { GENRES } from '../data/yonkoma';
@@ -159,6 +160,10 @@ export function yonkomaMode(): HTMLElement {
         ),
         copyButton(() => text, 'まとめてコピー', 'piece small'),
         favButton({ text, mode: 'yonkoma' }, 'piece small'),
+        ...shareButtons(
+          () => ({ mode: 'yonkoma', title: '4コマのネタ', items: [{ text }] }),
+          () => drawYonkoma(idea),
+        ),
       ),
       h('p', { class: 'hint-line' }, '「固定」した項目は、もう一度作っても変わりません'),
       view === 'panels' ? panelView() : listView(),

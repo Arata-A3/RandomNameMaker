@@ -2,6 +2,7 @@
 import { h } from './dom';
 import { icon } from './icons';
 import { favorites, type Mode } from './store';
+import { drawPlates, shareButtons } from './share';
 
 let toastTimer: number | undefined;
 
@@ -66,7 +67,15 @@ export function renderResults(container: HTMLElement, items: ResultItem[], mode:
   }
   const allText = () => items.map((i) => (i.sub ? `${i.text}（${i.sub}）` : i.text)).join('\n');
   container.replaceChildren(
-    resultsBar(title, `${items.length}件`, copyButton(allText, 'すべてコピー', 'piece small')),
+    resultsBar(
+      title,
+      `${items.length}件`,
+      copyButton(allText, 'すべてコピー', 'piece small'),
+      ...shareButtons(
+        () => ({ mode, title, items }),
+        () => drawPlates(title, items),
+      ),
+    ),
     h(
       'ul',
       { class: 'plates' },
