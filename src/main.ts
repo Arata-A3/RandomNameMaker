@@ -56,6 +56,7 @@ app.append(
     ),
   ),
   main,
+  h('footer', { class: 'site-footer' }, `v${__APP_VERSION__}`),
 );
 
 // 公開版だけ、オフライン用のサービスワーカーを登録する

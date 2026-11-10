@@ -975,3 +975,12 @@ dialog.shared .primary {
   width: 100%;
   margin-top: 20px;
 }
+
+/* 画面下のバージョン番号 */
+.site-footer {
+  padding: 8px 16px 20px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(43, 32, 20, 0.8);
+  letter-spacing: 0.05em;
+}
