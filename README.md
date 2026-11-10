@@ -48,3 +48,4 @@ tests/
 - [x] 4コマネタモード（`generators/yonkoma.ts` `data/yonkoma.ts`）
 - [x] UI・コピー・お気に入り（`src/ui/`）
 - [x] テスト（`tests/`、`npm test`）
+- [x] GitHub Pages で公開: https://arata-a3.github.io/RandomNameMaker/（main に push すると自動で更新）
