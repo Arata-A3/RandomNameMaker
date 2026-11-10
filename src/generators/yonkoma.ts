@@ -5,6 +5,7 @@
 import { Rng } from '../core/random';
 import { generateName, type Culture, type NameResult } from './name';
 import * as D from '../data/yonkoma';
+import type { Genre, GenreKey } from '../data/yonkoma';
 
 export interface YonkomaCharacter {
   name: NameResult;
@@ -16,6 +17,7 @@ export interface YonkomaCharacter {
 export interface YonkomaIdea {
   characters: YonkomaCharacter[];
   relation: string;
+  theme: string;
   place: string;
   season: string;
   prop: string;
@@ -26,13 +28,14 @@ export interface YonkomaIdea {
   ochi: string;
 }
 
-export type SceneField = 'relation' | 'place' | 'season' | 'prop' | 'ki' | 'sho' | 'ten' | 'ketsu' | 'ochi';
+export type SceneField = 'relation' | 'theme' | 'place' | 'season' | 'prop' | 'ki' | 'sho' | 'ten' | 'ketsu' | 'ochi';
 export type CharField = 'name' | 'personality' | 'role' | 'catchphrase';
 /** 'place' や 'c0.name' のような項目キー */
 export type FieldKey = SceneField | `c${number}.${CharField}`;
 
 export const SCENE_FIELDS: { key: SceneField; label: string }[] = [
   { key: 'relation', label: '関係性' },
+  { key: 'theme', label: 'テーマ' },
   { key: 'place', label: '舞台' },
   { key: 'season', label: '季節・時期' },
   { key: 'prop', label: '小道具' },
@@ -42,6 +45,11 @@ export const SCENE_FIELDS: { key: SceneField; label: string }[] = [
   { key: 'ketsu', label: '結' },
   { key: 'ochi', label: 'オチのタイプ' },
 ];
+
+/** 起承転結（4コマ表示で使う） */
+export const PANELS: { key: SceneField; label: string }[] = SCENE_FIELDS.filter((f) =>
+  ['ki', 'sho', 'ten', 'ketsu'].includes(f.key),
+);
 
 export const CHAR_FIELDS: { key: CharField; label: string }[] = [
   { key: 'name', label: '名前' },
@@ -53,13 +61,15 @@ export const CHAR_FIELDS: { key: CharField; label: string }[] = [
 export interface YonkomaOptions {
   characterCount: number;
   culture: Culture;
+  genre: Genre;
   seed?: string;
 }
 
-export const DEFAULT_YONKOMA_OPTIONS: YonkomaOptions = { characterCount: 2, culture: 'japan' };
+export const DEFAULT_YONKOMA_OPTIONS: YonkomaOptions = { characterCount: 2, culture: 'japan', genre: 'any' };
 
-const SCENE_POOLS: Record<SceneField, string[]> = {
+const COMMON_POOLS: Record<SceneField | 'role', string[]> = {
   relation: D.RELATIONS,
+  theme: D.THEMES,
   place: D.PLACES,
   season: D.SEASONS,
   prop: D.PROPS,
@@ -68,27 +78,41 @@ const SCENE_POOLS: Record<SceneField, string[]> = {
   ten: D.TEN,
   ketsu: D.KETSU,
   ochi: D.OCHI,
+  role: D.ROLES,
 };
 
-function rollCharField(rng: Rng, field: CharField, culture: Culture): string | NameResult {
+/** ジャンルの材料を優先して選ぶ割合 */
+const GENRE_RATE = 0.65;
+
+type Ctx = Pick<YonkomaOptions, 'culture' | 'genre'>;
+
+/** ジャンルの材料（あれば）と共通の材料から1つ選ぶ。avoid と同じ値はなるべく避ける */
+function pickFor(rng: Rng, key: SceneField | 'role', genre: Genre, avoid?: string): string {
+  const special = genre === 'any' ? undefined : D.GENRE_POOLS[genre][key as GenreKey];
+  const pool = special && rng.chance(GENRE_RATE) ? special : COMMON_POOLS[key];
+  const choices = pool.filter((s) => s !== avoid);
+  return rng.pick(choices.length ? choices : pool);
+}
+
+function rollCharField(rng: Rng, field: CharField, ctx: Ctx): string | NameResult {
   switch (field) {
     case 'name':
-      return generateName(rng, { culture, part: 'full', gender: 'any', source: 'mixed' });
+      return generateName(rng, { culture: ctx.culture, part: 'full', gender: 'any', source: 'mixed' });
     case 'personality':
       return rng.pick(D.PERSONALITIES);
     case 'role':
-      return rng.pick(D.ROLES);
+      return pickFor(rng, 'role', ctx.genre);
     case 'catchphrase':
       return rng.pick(D.CATCHPHRASES);
   }
 }
 
-function rollCharacter(rng: Rng, culture: Culture): YonkomaCharacter {
+function rollCharacter(rng: Rng, ctx: Ctx): YonkomaCharacter {
   return {
-    name: rollCharField(rng, 'name', culture) as NameResult,
-    personality: rollCharField(rng, 'personality', culture) as string,
-    role: rollCharField(rng, 'role', culture) as string,
-    catchphrase: rollCharField(rng, 'catchphrase', culture) as string,
+    name: rollCharField(rng, 'name', ctx) as NameResult,
+    personality: rollCharField(rng, 'personality', ctx) as string,
+    role: rollCharField(rng, 'role', ctx) as string,
+    catchphrase: rollCharField(rng, 'catchphrase', ctx) as string,
   };
 }
 
@@ -99,10 +123,11 @@ export function rollIdea(
   prev?: YonkomaIdea,
   locked: ReadonlySet<FieldKey> = new Set(),
 ): YonkomaIdea {
+  const ctx: Ctx = { culture: opts.culture, genre: opts.genre ?? 'any' };
   const count = Math.min(4, Math.max(1, Math.floor(opts.characterCount)));
   const characters: YonkomaCharacter[] = [];
   for (let i = 0; i < count; i++) {
-    const fresh = rollCharacter(rng, opts.culture);
+    const fresh = rollCharacter(rng, ctx);
     const old = prev?.characters[i];
     if (old) {
       for (const { key } of CHAR_FIELDS) {
@@ -113,14 +138,14 @@ export function rollIdea(
   }
   const idea = { characters } as YonkomaIdea;
   for (const { key } of SCENE_FIELDS) {
-    const v = rng.pick(SCENE_POOLS[key]);
-    idea[key] = prev && locked.has(key) ? prev[key] : v;
+    const v = pickFor(rng, key, ctx.genre);
+    idea[key] = prev && locked.has(key) && prev[key] ? prev[key] : v;
   }
   return idea;
 }
 
 /** 1項目だけ引き直す（元の idea は変えずに新しいオブジェクトを返す） */
-export function rerollField(idea: YonkomaIdea, key: FieldKey, culture: Culture, rng = new Rng()): YonkomaIdea {
+export function rerollField(idea: YonkomaIdea, key: FieldKey, ctx: Ctx, rng = new Rng()): YonkomaIdea {
   const next: YonkomaIdea = { ...idea, characters: idea.characters.map((c) => ({ ...c })) };
   const m = /^c(\d+)\.(\w+)$/.exec(key);
   if (m) {
@@ -129,14 +154,13 @@ export function rerollField(idea: YonkomaIdea, key: FieldKey, culture: Culture, 
     const ch = next.characters[i];
     if (!ch) return next;
     // 同じ値が続かないように数回引き直す
-    let v = rollCharField(rng, field, culture);
-    for (let t = 0; t < 5 && sameValue(v, ch[field]); t++) v = rollCharField(rng, field, culture);
+    let v = rollCharField(rng, field, ctx);
+    for (let t = 0; t < 5 && sameValue(v, ch[field]); t++) v = rollCharField(rng, field, ctx);
     (ch as unknown as Record<string, unknown>)[field] = v;
     return next;
   }
   const f = key as SceneField;
-  const pool = SCENE_POOLS[f].filter((s) => s !== idea[f]);
-  next[f] = rng.pick(pool.length ? pool : SCENE_POOLS[f]);
+  next[f] = pickFor(rng, f, ctx.genre, idea[f]);
   return next;
 }
 

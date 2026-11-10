@@ -402,3 +402,59 @@ button.ghost.danger {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+.hint-line {
+  margin: 0 0 10px;
+}
+
+/* 4コマ表示 */
+.strip {
+  list-style: none;
+  margin: 8px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.koma {
+  display: grid;
+  grid-template-columns: 3.2em 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 72px;
+  border: 2px solid var(--text);
+  border-radius: 4px;
+  padding: 8px 10px;
+}
+
+.koma.locked {
+  background: var(--lock);
+}
+
+.koma-num {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  line-height: 1.1;
+}
+
+.koma-num span {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.koma-text {
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+
+.panel-setting {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
