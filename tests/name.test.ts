@@ -38,6 +38,15 @@ describe('generateNames', () => {
     }
   });
 
+  it('欧米・ファンタジーの名前にはカタカナの読みが付く', () => {
+    for (const culture of ['english', 'german', 'french', 'nordic', 'fantasy'] as const) {
+      for (const source of ['real', 'generated'] as const) {
+        const out = generateNames({ culture, part: 'full', gender: 'any', source, count: 50, seed: culture });
+        for (const r of out) expect(r.reading, r.text).toMatch(/^[ァ-ヴー]+・[ァ-ヴー]+$/);
+      }
+    }
+  });
+
   it('苗字だけ', () => {
     const out = generateNames({ culture: 'english', part: 'family', gender: 'any', source: 'real', count: 5 });
     for (const r of out) expect(r.text).not.toContain(' ');

@@ -1,6 +1,7 @@
 /** 名前モード */
 import { Rng } from '../core/random';
 import { MarkovModel } from '../core/markov';
+import { toKatakanaName, type Spelling } from '../core/katakana';
 import type { Entry } from '../data/names/parse';
 import * as JP from '../data/names/japan';
 import * as CN from '../data/names/chinese';
@@ -155,6 +156,7 @@ export function generateName(rng: Rng, opts: Omit<NameOptions, 'count' | 'seed'>
   let reading: string | undefined;
   if (culture === 'japan') reading = ordered.map((p) => p.reading).join(' ');
   if (culture === 'chinese') reading = ordered.map((p) => capital(p.reading ?? '')).join(' ');
+  if (!eastern) reading = ordered.map((p) => toKatakanaName(p.text, culture as Spelling)).join('・');
   return { text, reading, gender };
 }
 
