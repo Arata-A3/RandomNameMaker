@@ -1,0 +1,16 @@
+{
+  "name": "RandomNameMaker",
+  "short_name": "名前メーカー",
+  "description": "名前・文字列・言葉・4コマのネタをランダムに作るツール",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#B98352",
+  "theme_color": "#4A2F1B",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

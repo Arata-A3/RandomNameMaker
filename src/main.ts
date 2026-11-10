@@ -57,5 +57,14 @@ app.append(
   main,
 );
 
+// 公開版だけ、オフライン用のサービスワーカーを登録する
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {
+      /* 登録できなくても普通に使える */
+    });
+  });
+}
+
 const saved = load<Tab>('tab', 'name');
 show(TABS.some((t) => t.id === saved) ? saved : 'name');

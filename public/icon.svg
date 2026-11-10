@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+  <!-- ホーム画面用の大きいアイコン（木のサイコロ）。目と文字は各面の座標の上に置く -->
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#6A4429"/><stop offset="1" stop-color="#36210F"/></linearGradient>
+    <linearGradient id="top" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F6DCAE"/><stop offset="1" stop-color="#E4BC84"/></linearGradient>
+    <linearGradient id="left" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D19C5F"/><stop offset="1" stop-color="#B9854B"/></linearGradient>
+    <linearGradient id="right" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9733D"/><stop offset="1" stop-color="#875628"/></linearGradient>
+  </defs>
+  <rect width="160" height="160" fill="url(#tile)"/>
+  <path d="M8 40 Q60 34 152 46 M8 92 Q80 86 152 98 M8 128 Q70 122 152 132" fill="none" stroke="#FFD9A8" stroke-opacity="0.07" stroke-width="2"/>
+  <ellipse cx="80" cy="141" rx="50" ry="8" fill="#140B05" opacity="0.45"/>
+  <path d="M26 47 L80 20 L134 47 L80 74 Z" fill="url(#top)"/>
+  <path d="M26 47 L80 74 L80 134 L26 107 Z" fill="url(#left)"/>
+  <path d="M80 74 L134 47 L134 107 L80 134 Z" fill="url(#right)"/>
+  <path d="M26 47 L80 74 L134 47" fill="none" stroke="#FFEACB" stroke-width="2" stroke-linejoin="round" opacity="0.8"/>
+  <path d="M80 74 V134" fill="none" stroke="#7A4D22" stroke-width="1.5" opacity="0.6"/>
+  <g transform="matrix(0.54 -0.27 0.54 0.27 26 47)">
+    <path d="M10 28 Q50 22 90 32 M12 74 Q50 68 88 78" fill="none" stroke="#C4945B" stroke-opacity="0.5" stroke-width="2.6"/>
+    <circle cx="50" cy="50" r="17" fill="#8E2A18"/>
+    <circle cx="50" cy="50" r="14.5" fill="#C2452D"/>
+  </g>
+  <g transform="matrix(0.54 0.27 0 0.6 26 47)">
+    <path d="M20 8 Q28 50 20 92 M82 10 Q74 50 82 90" fill="none" stroke="#A06C38" stroke-opacity="0.5" stroke-width="2.4"/>
+    <text x="50" y="70.2" text-anchor="middle" font-family="Zen Kaku Gothic New, Yu Gothic, Hiragino Sans, sans-serif" font-weight="700" font-size="54" fill="#FFE9C6" fill-opacity="0.35">あ</text>
+    <text x="50" y="69" text-anchor="middle" font-family="Zen Kaku Gothic New, Yu Gothic, Hiragino Sans, sans-serif" font-weight="700" font-size="54" fill="#3B2414">あ</text>
+  </g>
+  <g transform="matrix(0.54 -0.27 0 0.6 80 74)">
+    <path d="M18 8 Q26 50 18 92 M62 10 Q54 50 62 90" fill="none" stroke="#6E4219" stroke-opacity="0.45" stroke-width="2.4"/>
+    <g fill="#E2B27A" fill-opacity="0.45"><circle cx="28" cy="30" r="10.5"/><circle cx="72" cy="30" r="10.5"/><circle cx="28" cy="74" r="10.5"/><circle cx="72" cy="74" r="10.5"/></g>
+    <g fill="#2B1A0C"><circle cx="28" cy="28" r="10"/><circle cx="72" cy="28" r="10"/><circle cx="28" cy="72" r="10"/><circle cx="72" cy="72" r="10"/></g>
+  </g>
+</svg>
