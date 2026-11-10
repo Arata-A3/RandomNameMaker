@@ -42,7 +42,7 @@ tests/
 
 ### 進み具合
 - [x] プロジェクトの土台、シード付き乱数（`src/core/random.ts`）、かなのモーラ表（`src/core/kana.ts`）
-- [ ] 文字種・発音ルール・文字列モード
+- [x] 文字種・発音ルール・文字列モード（`charset.ts` `pronounce.ts` `generators/string.ts`）
 - [ ] 名前モード（国風データ・マルコフ連鎖）
 - [ ] 単語モード
 - [ ] 4コマネタモード
