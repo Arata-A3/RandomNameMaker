@@ -22,23 +22,30 @@ export function icon(name: IconName, size = 16, filled = false): HTMLSpanElement
   return span;
 }
 
-/** ロゴ（名前の木札） */
+/**
+ * ロゴ（木のサイコロ）。
+ * 目と文字は、各面の傾きに合わせた座標（0〜100 の正方形をその面に写す変換）の上に置く。
+ *   天面: matrix(0.54 -0.27 0.54 0.27 26 47)
+ *   左面: matrix(0.54 0.27 0 0.6 26 47)
+ *   右面: matrix(0.54 -0.27 0 0.6 80 74)
+ */
 export function logo(size = 44): HTMLSpanElement {
   const span = document.createElement('span');
   span.className = 'logo';
   span.setAttribute('aria-hidden', 'true');
   span.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 160 160">
 <defs>
-<linearGradient id="logo-face" x1="0" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#F5DDB3"/><stop offset="0.55" stop-color="#E8C48F"/><stop offset="1" stop-color="#D6A86E"/></linearGradient>
-<linearGradient id="logo-edge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B98650"/><stop offset="1" stop-color="#8E6033"/></linearGradient>
+<linearGradient id="logo-top" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F6DCAE"/><stop offset="1" stop-color="#E4BC84"/></linearGradient>
+<linearGradient id="logo-left" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D19C5F"/><stop offset="1" stop-color="#B9854B"/></linearGradient>
+<linearGradient id="logo-right" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9733D"/><stop offset="1" stop-color="#875628"/></linearGradient>
 </defs>
-<path d="M80 30 L62 8 Q80 0 98 8 Z" fill="none" stroke="#E9D3A6" stroke-width="5" stroke-linejoin="round"/>
-<path d="M44 34 H116 L128 46 V146 Q128 156 116 156 H44 Q32 156 32 146 V46 Z" fill="url(#logo-edge)"/>
-<path d="M44 28 H116 L128 40 V140 Q128 150 116 150 H44 Q32 150 32 140 V40 Z" fill="url(#logo-face)"/>
-<path d="M44 60 Q58 70 52 100 Q48 126 58 148" fill="none" stroke="#B88449" stroke-opacity="0.45" stroke-width="2"/>
-<path d="M110 46 Q102 72 108 98 Q114 122 106 148" fill="none" stroke="#B88449" stroke-opacity="0.4" stroke-width="2"/>
-<circle cx="80" cy="42" r="6" fill="#3B2414"/>
-<text x="80" y="128" text-anchor="middle" font-family="'Shippori Mincho B1', serif" font-weight="800" font-size="64" fill="#3B2414">名</text>
+<path d="M26 47 L80 20 L134 47 L80 74 Z" fill="url(#logo-top)" stroke="url(#logo-top)" stroke-width="6" stroke-linejoin="round"/>
+<path d="M26 47 L80 74 L80 134 L26 107 Z" fill="url(#logo-left)" stroke="url(#logo-left)" stroke-width="6" stroke-linejoin="round"/>
+<path d="M80 74 L134 47 L134 107 L80 134 Z" fill="url(#logo-right)" stroke="url(#logo-right)" stroke-width="6" stroke-linejoin="round"/>
+<path d="M26 47 L80 74 L134 47" fill="none" stroke="#FFEACB" stroke-width="2.5" stroke-linejoin="round" opacity="0.8"/>
+<g transform="matrix(0.54 -0.27 0.54 0.27 26 47)"><circle cx="50" cy="50" r="17" fill="#8E2A18"/><circle cx="50" cy="50" r="14.5" fill="#C2452D"/></g>
+<g transform="matrix(0.54 0.27 0 0.6 26 47)"><text x="50" y="69" text-anchor="middle" font-family="'Zen Kaku Gothic New', 'Yu Gothic', sans-serif" font-weight="700" font-size="54" fill="#3B2414">あ</text></g>
+<g transform="matrix(0.54 -0.27 0 0.6 80 74)" fill="#2B1A0C"><circle cx="28" cy="28" r="11"/><circle cx="72" cy="28" r="11"/><circle cx="28" cy="72" r="11"/><circle cx="72" cy="72" r="11"/></g>
 </svg>`;
   return span;
 }
