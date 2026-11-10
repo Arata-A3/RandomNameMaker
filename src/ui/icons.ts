@@ -10,6 +10,13 @@ const PATHS = {
   chevron: '<path d="M9 6l6 6-6 6"/>',
   check: '<path d="M5 12l5 5 9-10"/>',
   trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  share: '<path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/>',
+  image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
+  // モードのタブ
+  text: '<path d="M4 7V5h16v2M9 19h6M12 5v14"/>',
+  tag: '<path d="M4 9h16v11H4z" stroke-linejoin="round"/><path d="M12 9V5M9 5h6M8 14h8"/>',
+  words: '<path d="M4 6h10M4 12h16M4 18h7"/>',
+  koma: '<path d="M6 2h12v20H6zM6 7h12M6 12h12M6 17h12" stroke-linejoin="round"/>',
 } as const;
 
 export type IconName = keyof typeof PATHS;

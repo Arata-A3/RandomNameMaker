@@ -26,18 +26,28 @@ interface LayoutOptions {
   advanced?: HTMLElement[];
 }
 
-/** 共通の枠: 左に和紙の条件、右に結果 */
+let formSeq = 0;
+const isPhone = () => window.matchMedia('(max-width: 720px)').matches;
+
+/**
+ * 共通の枠: 左に和紙の条件、右に結果。
+ * スマホでは主ボタンを画面下（タブの上）に固定して、押したら結果まで送る。
+ */
 export function layout(form: HTMLElement[], onGenerate: () => void, results: HTMLElement, o: LayoutOptions): HTMLElement {
+  const formId = `options-${++formSeq}`;
+  const output = h('section', { class: 'output', 'aria-live': 'polite' }, results);
   return h(
     'div',
     { class: 'mode' },
     h(
       'form',
       {
+        id: formId,
         class: 'options washi',
         onsubmit: (e: Event) => {
           e.preventDefault();
           onGenerate();
+          if (isPhone()) output.scrollIntoView({ behavior: 'smooth', block: 'start' });
         },
       },
       h('h2', { class: 'options-title' }, '条件'),
@@ -47,13 +57,15 @@ export function layout(form: HTMLElement[], onGenerate: () => void, results: HTM
         : null,
       h(
         'button',
-        { type: 'submit', class: 'primary wood-walnut' },
+        { type: 'submit', class: 'primary wood-walnut in-form' },
         icon('dice', 22),
         o.submitLabel,
         h('kbd', {}, 'Enter'),
       ),
     ),
-    h('section', { class: 'output', 'aria-live': 'polite' }, results),
+    output,
+    // スマホ用: 親指の届く位置に固定した主ボタン
+    h('div', { class: 'cta-bar' }, h('button', { type: 'submit', form: formId, class: 'primary wood-walnut' }, icon('dice', 22), o.submitLabel)),
   );
 }
 

@@ -1,6 +1,6 @@
 import './style.css';
 import { h } from './ui/dom';
-import { logo } from './ui/icons';
+import { icon, logo, type IconName } from './ui/icons';
 import { load, save } from './ui/store';
 import { nameMode, stringMode, wordMode } from './ui/modes';
 import { yonkomaMode } from './ui/yonkomaMode';
@@ -8,12 +8,12 @@ import { favoritesView } from './ui/favoritesView';
 
 type Tab = 'string' | 'name' | 'word' | 'yonkoma' | 'favorites';
 
-const TABS: { id: Tab; label: string; make: () => HTMLElement }[] = [
-  { id: 'string', label: '文字列', make: stringMode },
-  { id: 'name', label: '名前', make: nameMode },
-  { id: 'word', label: '単語', make: wordMode },
-  { id: 'yonkoma', label: '4コマネタ', make: yonkomaMode },
-  { id: 'favorites', label: '保存', make: favoritesView },
+const TABS: { id: Tab; label: string; icon: IconName; make: () => HTMLElement }[] = [
+  { id: 'string', label: '文字列', icon: 'text', make: stringMode },
+  { id: 'name', label: '名前', icon: 'tag', make: nameMode },
+  { id: 'word', label: '単語', icon: 'words', make: wordMode },
+  { id: 'yonkoma', label: '4コマネタ', icon: 'koma', make: yonkomaMode },
+  { id: 'favorites', label: '保存', icon: 'star', make: favoritesView },
 ];
 
 const app = document.getElementById('app')!;
@@ -38,7 +38,9 @@ function show(tab: Tab) {
 }
 
 nav.append(
-  ...TABS.map((t) => h('button', { type: 'button', role: 'tab', 'data-tab': t.id, onclick: () => show(t.id) }, t.label)),
+  ...TABS.map((t) =>
+    h('button', { type: 'button', role: 'tab', 'data-tab': t.id, onclick: () => show(t.id) }, icon(t.icon, 20), h('span', {}, t.label)),
+  ),
 );
 
 app.append(
