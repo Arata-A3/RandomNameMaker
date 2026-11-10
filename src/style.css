@@ -1,33 +1,22 @@
+/*
+ * 木の UI
+ * 机（楢の板）の上に、和紙の条件と、釘に掛けた檜の名札を並べる。
+ * 押せるもの = 下に影のある木の駒。選んでいるもの = 胡桃色にへこんだ駒。
+ */
 :root {
-  --bg: #f6f5f2;
-  --panel: #ffffff;
-  --text: #1f1f1d;
-  --muted: #6b6a66;
-  --line: #e2e0da;
-  --accent: #3b6fd6;
-  --accent-text: #ffffff;
-  --accent-soft: #e6edfb;
-  --star: #d99a00;
-  --danger: #c0392b;
-  --lock: #fff6dc;
+  --ink: #2b2014;
+  --ink-sub: #5e4a35;
+  --cream: #f7ebd6;
+  --cream-sub: #e2cba5;
+  --washi: #fbf6ec;
+  --line: #cdb894;
+  --hinoki-edge: #a97e4c;
+  --walnut-edge: #2a190c;
+  --seal: #b43c25;
+  --seal-soft: #f6e1d8;
+  --font-body: 'Zen Kaku Gothic New', system-ui, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+  --font-name: 'Shippori Mincho B1', 'Yu Mincho', 'Hiragino Mincho ProN', serif;
   color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #171716;
-    --panel: #22221f;
-    --text: #ecebe6;
-    --muted: #9c9a93;
-    --line: #36352f;
-    --accent: #7ea2f0;
-    --accent-text: #11131a;
-    --accent-soft: #263049;
-    --star: #f2c14e;
-    --danger: #ef7a6d;
-    --lock: #3a3220;
-    color-scheme: dark;
-  }
 }
 
 * {
@@ -36,307 +25,620 @@
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, -apple-system, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', sans-serif;
+  color: var(--ink);
+  font-family: var(--font-body);
   line-height: 1.6;
+  /* 楢の板を並べた机 */
+  background-color: #b98352;
+  background-image:
+    repeating-linear-gradient(178deg, rgba(70, 40, 15, 0.1) 0 2px, transparent 2px 13px, rgba(70, 40, 15, 0.07) 13px 15px, transparent 15px 34px, rgba(255, 225, 180, 0.08) 34px 36px, transparent 36px 61px),
+    repeating-linear-gradient(180deg, transparent 0 178px, rgba(50, 28, 10, 0.35) 178px 180px, rgba(255, 230, 190, 0.12) 180px 182px),
+    linear-gradient(180deg, #c28c5a, #ad774a);
+  min-height: 100vh;
 }
 
-#app {
-  max-width: 1080px;
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 木の質感 */
+.wood-walnut {
+  background-color: #4a2f1b;
+  background-image:
+    repeating-linear-gradient(176deg, rgba(0, 0, 0, 0.18) 0 2px, transparent 2px 9px, rgba(255, 210, 160, 0.06) 9px 10px, transparent 10px 23px),
+    linear-gradient(180deg, #5a3a22, #3e2716);
+  color: var(--cream);
+}
+
+.wood-hinoki {
+  background-color: #ebcfa3;
+  background-image:
+    repeating-linear-gradient(92deg, rgba(160, 110, 55, 0.12) 0 1.5px, transparent 1.5px 10px, rgba(160, 110, 55, 0.07) 10px 11px, transparent 11px 27px),
+    linear-gradient(180deg, #f1d9b2, #e3c496);
+  color: var(--ink);
+}
+
+.washi {
+  background-color: var(--washi);
+  background-image: radial-gradient(rgba(150, 120, 80, 0.06) 1px, transparent 1.2px);
+  background-size: 7px 9px;
+  border-radius: 6px;
+  box-shadow: 0 1px 0 #e3d3b6, 0 14px 28px rgba(50, 25, 8, 0.35);
+}
+
+/* 見出し（胡桃の帯） */
+.site-header {
+  box-shadow: 0 4px 0 var(--walnut-edge), 0 10px 20px rgba(30, 15, 5, 0.35);
+  position: relative;
+  z-index: 1;
+}
+
+.header-inner {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 24px 16px 64px;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 1.6rem;
-  letter-spacing: 0.02em;
-}
-
-header p {
-  margin: 4px 0 16px;
-}
-
-.muted {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-/* タブ */
-.tabs {
+  padding: 12px 24px;
   display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 16px;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand h1 {
+  margin: 0;
+  font-family: var(--font-name);
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: 0.03em;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.brand p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--cream-sub);
+}
+
+.logo {
+  display: inline-flex;
+}
+
+/* モードのタブ（選んでいるものだけ檜の札） */
+.tabs {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .tabs button {
-  border: none;
-  background: none;
-  color: var(--muted);
   font: inherit;
-  padding: 10px 14px;
+  font-size: 0.95rem;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(233, 214, 176, 0.35);
+  background-color: transparent;
+  color: #e9d6b0;
   cursor: pointer;
-  border-bottom: 3px solid transparent;
-  white-space: nowrap;
+}
+
+.tabs button:hover {
+  border-color: rgba(233, 214, 176, 0.8);
+  color: #fff8ea;
 }
 
 .tabs button.on {
-  color: var(--text);
-  border-bottom-color: var(--accent);
-  font-weight: 600;
+  border-color: transparent;
+  color: var(--ink);
+  font-weight: 700;
+  box-shadow: 0 3px 0 var(--hinoki-edge), 0 0 0 2px var(--cream);
 }
 
-/* 2カラム */
+/* ページの枠 */
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 24px 64px;
+}
+
 .mode {
-  display: grid;
-  grid-template-columns: minmax(280px, 360px) 1fr;
-  gap: 16px;
-  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  align-items: flex-start;
 }
 
-@media (max-width: 760px) {
-  .mode {
-    grid-template-columns: 1fr;
-  }
-}
-
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 16px;
-}
-
+/* 条件（和紙） */
 .options {
+  flex: 1 1 300px;
+  max-width: 370px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.options-title {
+  margin: 0;
+  font-family: var(--font-name);
+  font-weight: 800;
+  font-size: 1.25rem;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 6px;
+}
+
+.field-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.hint {
+  color: var(--ink-sub);
+  font-size: 0.8rem;
+  margin-top: 6px;
+}
+
+.output {
+  flex: 999 1 560px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.field-label {
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-bottom: 6px;
-}
-
-.hint {
-  color: var(--muted);
-  font-size: 0.8rem;
-  margin-top: 4px;
-}
-
-.checks {
+/* 木の駒（押せるもの） */
+.pieces {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 14px;
+  gap: 8px;
 }
 
-.checks.col {
+.pieces.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.pieces.col {
   flex-direction: column;
+  align-items: stretch;
 }
 
-.check {
+.piece {
+  font: inherit;
+  font-size: 0.9rem;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   cursor: pointer;
+  color: var(--ink);
+  background-color: #ebcfa3;
+  background-image:
+    repeating-linear-gradient(92deg, rgba(160, 110, 55, 0.12) 0 1.5px, transparent 1.5px 10px, rgba(160, 110, 55, 0.07) 10px 11px, transparent 11px 27px),
+    linear-gradient(180deg, #f3ddb8, #e3c496);
+  box-shadow: 0 3px 0 var(--hinoki-edge), 0 4px 8px rgba(80, 50, 20, 0.12);
+  transition:
+    transform 0.08s,
+    box-shadow 0.08s;
+  user-select: none;
 }
 
-input[type='checkbox'] {
+.piece:hover:not(:disabled) {
+  filter: brightness(1.04);
+  box-shadow: 0 3px 0 var(--hinoki-edge), 0 6px 12px rgba(80, 50, 20, 0.2);
+}
+
+.piece:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--hinoki-edge);
+}
+
+.piece:disabled {
+  opacity: 0.45;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* 選んでいる駒は胡桃色にへこむ */
+.piece.on,
+.piece.check:has(input:checked) {
+  color: var(--cream);
+  font-weight: 700;
+  background-color: #4a2f1b;
+  background-image:
+    repeating-linear-gradient(176deg, rgba(0, 0, 0, 0.18) 0 2px, transparent 2px 9px, rgba(255, 210, 160, 0.06) 9px 10px, transparent 10px 23px),
+    linear-gradient(180deg, #5a3a22, #3e2716);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.55);
+  transform: translateY(2px);
+}
+
+.piece.check {
+  justify-content: flex-start;
+  text-align: left;
+  line-height: 1.3;
+  padding: 6px 12px 6px 10px;
+}
+
+.piece .mark {
+  flex: none;
   width: 18px;
   height: 18px;
-  accent-color: var(--accent);
+  border-radius: 5px;
+  border: 1.5px solid #9f7a4b;
+  background: rgba(255, 250, 240, 0.7);
+  display: grid;
+  place-items: center;
+  color: transparent;
 }
 
-input[type='number'],
-input[type='text'] {
-  font: inherit;
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 6px 10px;
-  width: 100%;
+.piece.check:has(input:checked) .mark {
+  border-color: var(--cream);
+  background: var(--cream);
+  color: var(--ink);
 }
 
-input[type='number'] {
-  width: 96px;
+.piece.small {
+  min-height: 40px;
+  font-size: 0.85rem;
 }
 
+.piece.danger {
+  color: var(--seal);
+}
+
+.piece.lock.on {
+  font-weight: 700;
+}
+
+/* キーボードで選んだときの枠 */
+button:focus-visible,
+summary:focus-visible,
 input:focus-visible,
-button:focus-visible {
-  outline: 2px solid var(--accent);
+.piece:has(input:focus-visible) {
+  outline: 3px solid var(--seal);
   outline-offset: 2px;
+}
+
+/* 数の入力 */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepper .piece {
+  width: 46px;
+  padding: 0;
+  font-size: 1.3rem;
+}
+
+.stepper input,
+.text-input {
+  font: inherit;
+  color: var(--ink);
+  background: #fffdf8;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  box-shadow: inset 0 2px 3px rgba(120, 80, 40, 0.15);
+  min-height: 44px;
+}
+
+.stepper input {
+  width: 72px;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.text-input {
+  width: 100%;
+  padding: 0 12px;
 }
 
 .range {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.segmented {
-  display: flex;
   flex-wrap: wrap;
-  gap: 6px;
 }
 
-.segmented button {
-  font: inherit;
-  font-size: 0.9rem;
-  border: 1px solid var(--line);
-  background: var(--bg);
-  color: var(--text);
-  border-radius: 999px;
-  padding: 4px 12px;
+/* くわしい設定 */
+.advanced {
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+
+.advanced summary {
+  list-style: none;
   cursor: pointer;
-}
-
-.segmented button.on {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-text);
-}
-
-button.primary {
-  font: inherit;
-  font-weight: 600;
-  background: var(--accent);
-  color: var(--accent-text);
-  border: none;
-  border-radius: 10px;
-  padding: 10px;
-  cursor: pointer;
-}
-
-button.primary:hover {
-  filter: brightness(1.08);
-}
-
-button.ghost {
-  font: inherit;
-  font-size: 0.85rem;
-  background: none;
-  border: 1px solid var(--line);
-  color: var(--text);
-  border-radius: 8px;
-  padding: 4px 10px;
-  cursor: pointer;
-}
-
-button.ghost.danger {
-  color: var(--danger);
-}
-
-.icon-btn {
-  font: inherit;
-  width: 34px;
-  height: 34px;
-  display: inline-grid;
-  place-items: center;
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 1.05rem;
-}
-
-.icon-btn:hover:not(:disabled) {
-  background: var(--accent-soft);
-  color: var(--text);
-}
-
-.icon-btn:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-
-.icon-btn.fav.on {
-  color: var(--star);
-}
-
-/* 結果 */
-.results-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
+  gap: 6px;
+  min-height: 40px;
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
-.results {
+.advanced summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced summary .icon {
+  transition: transform 0.15s;
+}
+
+.advanced[open] summary .icon {
+  transform: rotate(90deg);
+}
+
+.advanced-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+/* 主ボタン（胡桃の角材） */
+.primary {
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.15rem;
+  min-height: 60px;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+  box-shadow: 0 5px 0 var(--walnut-edge), 0 10px 18px rgba(40, 20, 6, 0.35), inset 0 1px 0 rgba(255, 220, 170, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  transition:
+    transform 0.08s,
+    box-shadow 0.08s;
+}
+
+.primary:hover {
+  filter: brightness(1.12);
+}
+
+.primary:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--walnut-edge), inset 0 1px 0 rgba(255, 220, 170, 0.25);
+}
+
+.primary kbd {
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid rgba(247, 235, 214, 0.5);
+  border-radius: 6px;
+  padding: 0 6px;
+  text-shadow: none;
+}
+
+.icon {
+  display: inline-flex;
+  flex: none;
+}
+
+/* 結果の帯 */
+.results-bar {
+  border-radius: 10px;
+  padding: 8px 10px 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  box-shadow: 0 3px 0 var(--walnut-edge);
+}
+
+.results-bar h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.results-bar .count {
+  font-weight: 400;
+  color: var(--cream-sub);
+  font-size: 0.9rem;
+}
+
+.bar-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.hint-line {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #fff3dc;
+  text-shadow: 0 1px 2px rgba(40, 20, 6, 0.6);
+}
+
+/* 釘に掛けた檜の名札 */
+.plates {
   list-style: none;
   margin: 0;
   padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 18px 16px;
 }
 
-.results li {
+.plate-wrap {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 6px 0;
-  border-top: 1px solid var(--line);
-}
-
-.result-text {
-  flex: 1;
   min-width: 0;
+}
+
+.plate-wrap.wide {
+  grid-column: 1 / -1;
+}
+
+.nail {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #3a2a1c;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 230, 190, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.cord {
+  width: 70px;
+  height: 14px;
+  border: 2px solid #e9d6b0;
+  border-bottom: 0;
+  border-radius: 40px 40px 0 0;
+  margin-top: -6px;
+}
+
+.plate {
+  width: 100%;
+  padding: 14px 12px 12px;
+  border-radius: 6px 6px 10px 10px;
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 10px;
-}
-
-.result-text .main {
-  font-size: 1.15rem;
-  overflow-wrap: anywhere;
-}
-
-.result-text .main.pre {
-  font-size: 0.95rem;
-  white-space: pre-wrap;
-}
-
-.sub {
-  color: var(--muted);
-  font-size: 0.85rem;
-  margin-left: 6px;
-}
-
-.result-actions {
-  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 2px;
+  text-align: center;
+  box-shadow: 0 4px 0 #9c6f3f, 0 10px 18px rgba(40, 20, 6, 0.35), inset 0 1px 0 rgba(255, 245, 225, 0.6);
 }
 
-.tag {
+/* 札をすこしずつ傾ける */
+.plate-wrap:nth-child(4n + 1) .plate {
+  transform: rotate(-1deg);
+}
+.plate-wrap:nth-child(4n + 2) .plate {
+  transform: rotate(0.7deg);
+}
+.plate-wrap:nth-child(4n + 3) .plate {
+  transform: rotate(-0.4deg);
+}
+.plate-wrap:nth-child(4n) .plate {
+  transform: rotate(1deg);
+}
+.plate-wrap.wide .plate {
+  transform: none;
+  align-items: stretch;
+  text-align: left;
+}
+
+.plate .reading {
   font-size: 0.75rem;
-  border: 1px solid var(--line);
+  color: var(--ink-sub);
+  letter-spacing: 0.1em;
+}
+
+.plate .name {
+  font-family: var(--font-name);
+  font-weight: 800;
+  font-size: 1.75rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-shadow: 0 1px 0 rgba(255, 245, 225, 0.6);
+  max-width: 100%;
+}
+
+.plate .name.long {
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+
+.plate .name.pre {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  text-shadow: none;
+}
+
+.plate .tag {
+  font-size: 0.75rem;
+  border: 1px solid #b48b58;
   border-radius: 999px;
-  padding: 0 8px;
-  color: var(--muted);
+  padding: 0 10px;
+  align-self: center;
+}
+
+.plate-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* 名札の上の小さなボタン（文字付き） */
+.tool {
+  font: inherit;
+  font-size: 0.8rem;
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid #b48b58;
+  background: rgba(255, 250, 240, 0.75);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.tool:hover {
+  background: #fffaf0;
+  border-color: var(--ink-sub);
+}
+
+.tool.fav.on,
+.piece.fav.on {
+  color: var(--seal);
+  font-weight: 700;
+}
+
+.tool.fav.on {
+  border-color: var(--seal);
+  background: var(--seal-soft);
 }
 
 .empty {
-  color: var(--muted);
+  margin: 0;
+  padding: 20px;
+  color: var(--ink-sub);
 }
 
 /* 4コマ */
 .idea {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
 }
 
 .idea-card {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 10px 12px;
+  padding: 14px 16px;
+  min-width: 0;
 }
 
 .idea-card.wide {
@@ -345,24 +647,26 @@ button.ghost.danger {
 
 .idea-card h3 {
   margin: 0 0 6px;
-  font-size: 0.95rem;
+  font-family: var(--font-name);
+  font-size: 1.05rem;
+  font-weight: 800;
 }
 
 .idea-row {
   display: grid;
-  grid-template-columns: 6.5em 1fr auto;
+  grid-template-columns: 6em 1fr auto;
   align-items: center;
   gap: 8px;
-  padding: 4px 6px;
+  padding: 6px;
   border-radius: 8px;
 }
 
 .idea-row.locked {
-  background: var(--lock);
+  background: #f6e6cc;
 }
 
 .idea-label {
-  color: var(--muted);
+  color: var(--ink-sub);
   font-size: 0.85rem;
 }
 
@@ -372,12 +676,124 @@ button.ghost.danger {
 
 .idea-value .sub {
   display: block;
-  margin-left: 0;
-  line-height: 1.3;
+  color: var(--ink-sub);
+  font-size: 0.8rem;
 }
 
 .idea-actions {
   display: flex;
+  gap: 6px;
+}
+
+.idea-actions .piece {
+  min-height: 40px;
+  font-size: 0.8rem;
+  padding: 0 10px;
+}
+
+.setting {
+  margin: 0 0 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+}
+
+.setting div {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.setting dt {
+  color: var(--ink-sub);
+  font-size: 0.8rem;
+}
+
+.setting dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.strip {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.koma {
+  display: grid;
+  grid-template-columns: 2.6em 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 84px;
+  border: 2.5px solid var(--ink);
+  border-radius: 2px;
+  padding: 8px 10px;
+  background: #fffdf8;
+}
+
+.koma.locked {
+  background: #f6e6cc;
+}
+
+.koma-num {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-name);
+  font-weight: 800;
+  font-size: 1.3rem;
+  line-height: 1.1;
+}
+
+.koma-num span {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink-sub);
+}
+
+.koma-text {
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+
+/* スマホ */
+@media (max-width: 720px) {
+  .header-inner {
+    padding: 10px 16px;
+  }
+  .tabs {
+    margin-left: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .tabs button {
+    padding: 0 4px;
+    font-size: 0.8rem;
+  }
+  .page {
+    padding: 18px 16px 48px;
+  }
+  .options {
+    max-width: none;
+  }
+  .idea-row,
+  .koma {
+    grid-template-columns: 1fr;
+  }
+  .koma {
+    grid-template-columns: 2.4em 1fr;
+  }
+  .koma .idea-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
 }
 
 /* トースト */
@@ -386,13 +802,14 @@ button.ghost.danger {
   left: 50%;
   bottom: 24px;
   transform: translateX(-50%) translateY(20px);
-  background: var(--text);
-  color: var(--bg);
-  padding: 8px 16px;
-  border-radius: 999px;
+  background: var(--ink);
+  color: var(--cream);
+  padding: 10px 18px;
+  border-radius: 10px;
   font-size: 0.9rem;
   opacity: 0;
   pointer-events: none;
+  box-shadow: 0 6px 16px rgba(30, 15, 5, 0.4);
   transition:
     opacity 0.2s,
     transform 0.2s;
@@ -403,58 +820,42 @@ button.ghost.danger {
   transform: translateX(-50%) translateY(0);
 }
 
+/* 登場人物のカードは幅が狭いので、ボタンを値の下に置く */
+.idea-card:not(.wide) .idea-row {
+  grid-template-columns: 4.5em 1fr;
+}
+
+.idea-card:not(.wide) .idea-actions {
+  grid-column: 2;
+}
+
+/* 胡桃の帯の上で選んでいる駒は、ふちを明るくして見分けやすく */
+.results-bar .piece.on {
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.55), 0 0 0 1.5px var(--cream-sub);
+}
+
+/* 駒の文字は折り返さない */
+.piece {
+  white-space: nowrap;
+}
+
+/* チェックの駒は2列（「ひらがな」などが折り返さない幅） */
+.pieces.grid3:has(.check) {
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+}
+
+/* 文字数は「〜文字から」「〜文字まで」を縦に */
+.range {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .hint-line {
-  margin: 0 0 10px;
-}
-
-/* 4コマ表示 */
-.strip {
-  list-style: none;
-  margin: 8px 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.koma {
-  display: grid;
-  grid-template-columns: 3.2em 1fr auto;
-  align-items: center;
-  gap: 10px;
-  min-height: 72px;
-  border: 2px solid var(--text);
-  border-radius: 4px;
-  padding: 8px 10px;
-}
-
-.koma.locked {
-  background: var(--lock);
-}
-
-.koma-num {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-weight: 700;
-  font-size: 1.2rem;
-  line-height: 1.1;
-}
-
-.koma-num span {
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: var(--muted);
-}
-
-.koma-text {
-  font-size: 1.05rem;
-  overflow-wrap: anywhere;
-}
-
-.panel-setting {
-  display: flex;
-  gap: 10px;
-  align-items: baseline;
-  flex-wrap: wrap;
+  padding-left: 4px;
 }

@@ -1,7 +1,8 @@
 /** 4コマネタモードの画面 */
 import { field, h, numberInput, segmented } from './dom';
+import { icon } from './icons';
 import { load, save } from './store';
-import { copyText, favButton } from './results';
+import { copyButton, favButton, resultsBar } from './results';
 import { layout, seedField } from './modes';
 import { Rng } from '../core/random';
 import { CULTURES } from '../generators/name';
@@ -20,32 +21,33 @@ import {
   type YonkomaOptions,
 } from '../generators/yonkoma';
 
-type View = 'list' | 'panels';
+type View = 'panels' | 'list';
 
 export function yonkomaMode(): HTMLElement {
   const o: YonkomaOptions = load('opt:yonkoma', DEFAULT_YONKOMA_OPTIONS);
-  let view: View = load<View>('yonkoma:view', 'list');
+  let view: View = load<View>('yonkoma:view', 'panels');
   const locked = new Set<FieldKey>();
   let idea: YonkomaIdea = rollIdea(o);
   const results = h('div');
 
+  /** 固定ボタン（押すと胡桃色にへこみ「固定中」になる） */
   const lockButton = (key: FieldKey, label: string) => {
-    const isLocked = locked.has(key);
+    const on = locked.has(key);
     return h(
       'button',
       {
         type: 'button',
-        class: `icon-btn lock${isLocked ? ' on' : ''}`,
-        title: isLocked ? '固定を外す' : '固定する',
-        'aria-label': `${label}を${isLocked ? '固定から外す' : '固定する'}`,
-        'aria-pressed': String(isLocked),
+        class: `piece lock${on ? ' on' : ''}`,
+        'aria-pressed': String(on),
+        'aria-label': `${label}を${on ? '固定から外す' : '固定する'}`,
         onclick: () => {
-          if (isLocked) locked.delete(key);
+          if (on) locked.delete(key);
           else locked.add(key);
           render();
         },
       },
-      isLocked ? '🔒' : '🔓',
+      icon(on ? 'lock' : 'unlock', 15),
+      on ? '固定中' : '固定',
     );
   };
 
@@ -54,8 +56,7 @@ export function yonkomaMode(): HTMLElement {
       'button',
       {
         type: 'button',
-        class: 'icon-btn',
-        title: '引き直す',
+        class: 'piece',
         'aria-label': `${label}を引き直す`,
         disabled: locked.has(key),
         onclick: () => {
@@ -63,7 +64,8 @@ export function yonkomaMode(): HTMLElement {
           render();
         },
       },
-      '↻',
+      icon('reroll', 15),
+      '引き直す',
     );
 
   const row = (key: FieldKey, label: string, value: string, sub?: string) =>
@@ -79,7 +81,7 @@ export function yonkomaMode(): HTMLElement {
     idea.characters.map((c, i) =>
       h(
         'div',
-        { class: 'idea-card' },
+        { class: 'idea-card washi' },
         h('h3', {}, `登場人物 ${String.fromCharCode(65 + i)}`),
         CHAR_FIELDS.map(({ key, label }) =>
           key === 'name' ? row(`c${i}.name`, label, c.name.text, c.name.reading) : row(`c${i}.${key}`, label, c[key]),
@@ -87,32 +89,36 @@ export function yonkomaMode(): HTMLElement {
       ),
     );
 
-  /** 一覧表示: 全項目を並べる */
+  /** 一覧: 全項目を並べる */
   const listView = () =>
     h(
       'div',
       { class: 'idea' },
-      characterCards(),
       h(
         'div',
-        { class: 'idea-card wide' },
+        { class: 'idea-card washi wide' },
         h('h3', {}, '設定とお題'),
         SCENE_FIELDS.filter((f) => !(f.key === 'relation' && idea.characters.length < 2)).map(({ key, label }) =>
           row(key, label, fillTemplate(idea[key], idea)),
         ),
       ),
+      characterCards(),
     );
 
-  /** 4コマ表示: 起承転結をコマに見立てて縦に並べる */
+  /** 4コマ: 起承転結を和紙に貼ったコマとして並べる */
   const panelView = () => {
-    const setting = [idea.theme, idea.place, idea.season, idea.prop].join(' ／ ');
+    const setting = SCENE_FIELDS.filter((f) => ['theme', 'place', 'season', 'prop'].includes(f.key));
     return h(
       'div',
       { class: 'idea' },
       h(
         'div',
-        { class: 'idea-card wide' },
-        h('div', { class: 'panel-setting' }, h('span', { class: 'idea-label' }, '設定'), setting),
+        { class: 'idea-card washi wide' },
+        h(
+          'dl',
+          { class: 'setting' },
+          setting.map(({ key, label }) => h('div', {}, h('dt', {}, label), h('dd', {}, idea[key]))),
+        ),
         h(
           'ol',
           { class: 'strip' },
@@ -126,7 +132,7 @@ export function yonkomaMode(): HTMLElement {
             ),
           ),
         ),
-        h('div', { class: 'panel-setting' }, h('span', { class: 'idea-label' }, 'オチ'), idea.ochi),
+        row('ochi', 'オチのタイプ', idea.ochi),
       ),
       characterCards(),
     );
@@ -135,13 +141,13 @@ export function yonkomaMode(): HTMLElement {
   const render = () => {
     const text = ideaToText(idea);
     results.replaceChildren(
-      h(
-        'div',
-        { class: 'results-head' },
+      resultsBar(
+        '4コマのネタ',
+        '',
         segmented<View>(
           [
-            { id: 'list', label: '一覧' },
             { id: 'panels', label: '4コマ' },
+            { id: 'list', label: '一覧' },
           ],
           view,
           (v) => {
@@ -149,15 +155,12 @@ export function yonkomaMode(): HTMLElement {
             save('yonkoma:view', v);
             render();
           },
+          '表示',
         ),
-        h(
-          'div',
-          { class: 'result-actions' },
-          h('button', { type: 'button', class: 'ghost', onclick: () => copyText(text) }, 'まとめてコピー'),
-          favButton({ text, mode: 'yonkoma' }),
-        ),
+        copyButton(() => text, 'まとめてコピー', 'piece small'),
+        favButton({ text, mode: 'yonkoma' }, 'piece small'),
       ),
-      h('p', { class: 'muted hint-line' }, '🔒で固定した項目は「生成する」でも変わりません'),
+      h('p', { class: 'hint-line' }, '「固定」した項目は、もう一度作っても変わりません'),
       view === 'panels' ? panelView() : listView(),
     );
   };
@@ -174,11 +177,10 @@ export function yonkomaMode(): HTMLElement {
   };
 
   const form = [
-    field('ジャンル', segmented(GENRES, o.genre ?? 'any', (v) => (o.genre = v))),
-    field('登場人物の数', numberInput(o.characterCount, 1, (v) => (o.characterCount = v), 4)),
-    field('名前の国風', segmented(CULTURES, o.culture, (v) => (o.culture = v))),
-    seedField(o.seed, (v) => (o.seed = v)),
+    field('ジャンル', segmented(GENRES, o.genre ?? 'any', (v) => (o.genre = v), 'ジャンル')),
+    field('登場人物の数', numberInput(o.characterCount, 1, (v) => (o.characterCount = v), 4, '登場人物の数')),
+    field('名前の国風', segmented(CULTURES, o.culture, (v) => (o.culture = v), '名前の国風')),
   ];
   render();
-  return layout(form, run, results);
+  return layout(form, run, results, { submitLabel: 'ネタを引く', advanced: [seedField(o.seed, (v) => (o.seed = v))] });
 }

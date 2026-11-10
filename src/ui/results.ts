@@ -1,5 +1,6 @@
-/** 結果リスト・コピー・お気に入りボタン */
+/** 結果（木の名札）・コピー・保存ボタン */
 import { h } from './dom';
+import { icon } from './icons';
 import { favorites, type Mode } from './store';
 
 let toastTimer: number | undefined;
@@ -21,7 +22,7 @@ export async function copyText(text: string): Promise<void> {
     await navigator.clipboard.writeText(text);
   } catch {
     // clipboard API が使えないとき
-    const ta = h('textarea', { value: text });
+    const ta = h('textarea', {});
     ta.value = text;
     document.body.append(ta);
     ta.select();
@@ -31,18 +32,17 @@ export async function copyText(text: string): Promise<void> {
   toast('コピーしました');
 }
 
-export function copyButton(getText: () => string, label = 'コピー'): HTMLButtonElement {
-  return h('button', { type: 'button', class: 'icon-btn', title: label, 'aria-label': label, onclick: () => copyText(getText()) }, '⧉');
+export function copyButton(getText: () => string, label = 'コピー', cls = 'tool'): HTMLButtonElement {
+  return h('button', { type: 'button', class: cls, onclick: () => copyText(getText()) }, icon('copy', 14), label);
 }
 
-export function favButton(item: { text: string; sub?: string; mode: Mode }): HTMLButtonElement {
-  const btn = h('button', { type: 'button', class: 'icon-btn fav' });
+export function favButton(item: { text: string; sub?: string; mode: Mode }, cls = 'tool'): HTMLButtonElement {
+  const btn = h('button', { type: 'button', class: `${cls} fav` });
   const render = () => {
     const on = favorites.has(item.text);
-    btn.textContent = on ? '★' : '☆';
+    btn.replaceChildren(icon('star', 14, on), on ? '保存済み' : '保存');
     btn.classList.toggle('on', on);
-    btn.title = on ? 'お気に入りから外す' : 'お気に入りに追加';
-    btn.setAttribute('aria-label', btn.title);
+    btn.setAttribute('aria-pressed', String(on));
   };
   btn.addEventListener('click', () => {
     favorites.toggle(item);
@@ -58,31 +58,43 @@ export interface ResultItem {
   sub?: string;
 }
 
-/** 結果を並べる。上に「すべてコピー」 */
-export function renderResults(container: HTMLElement, items: ResultItem[], mode: Mode): void {
+/** 結果を木の名札として並べる。上に胡桃の帯（件数・すべてコピー） */
+export function renderResults(container: HTMLElement, items: ResultItem[], mode: Mode, title: string): void {
   if (items.length === 0) {
-    container.replaceChildren(h('p', { class: 'empty' }, '条件に合うものがありません。設定を見直してください。'));
+    container.replaceChildren(h('p', { class: 'empty washi' }, '条件に合うものがありません。条件を見直してください。'));
     return;
   }
   const allText = () => items.map((i) => (i.sub ? `${i.text}（${i.sub}）` : i.text)).join('\n');
   container.replaceChildren(
-    h(
-      'div',
-      { class: 'results-head' },
-      h('span', { class: 'muted' }, `${items.length}件`),
-      h('button', { type: 'button', class: 'ghost', onclick: () => copyText(allText()) }, 'すべてコピー'),
-    ),
+    resultsBar(title, `${items.length}件`, copyButton(allText, 'すべてコピー', 'piece small')),
     h(
       'ul',
-      { class: 'results' },
+      { class: 'plates' },
       items.map((it) =>
         h(
           'li',
-          {},
-          h('div', { class: 'result-text' }, h('span', { class: 'main' }, it.text), it.sub ? h('span', { class: 'sub' }, it.sub) : null),
-          h('div', { class: 'result-actions' }, copyButton(() => it.text), favButton({ ...it, mode })),
+          { class: 'plate-wrap' },
+          h('span', { class: 'nail', 'aria-hidden': 'true' }),
+          h('span', { class: 'cord', 'aria-hidden': 'true' }),
+          h(
+            'div',
+            { class: 'plate wood-hinoki' },
+            it.sub ? h('span', { class: 'reading' }, it.sub) : null,
+            h('span', { class: `name${[...it.text].length > 10 ? ' long' : ''}` }, it.text),
+            h('div', { class: 'plate-actions' }, copyButton(() => it.text), favButton({ ...it, mode })),
+          ),
         ),
       ),
     ),
+  );
+}
+
+/** 胡桃の帯（見出し・件数・右側のボタン） */
+export function resultsBar(title: string, count: string, ...actions: Node[]): HTMLDivElement {
+  return h(
+    'div',
+    { class: 'results-bar wood-walnut' },
+    h('h2', {}, title, ' ', h('span', { class: 'count' }, count)),
+    h('div', { class: 'bar-actions' }, ...actions),
   );
 }

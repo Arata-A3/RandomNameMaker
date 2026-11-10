@@ -1,59 +1,58 @@
-/** お気に入り一覧 */
+/** 保存した名札の一覧 */
 import { h } from './dom';
+import { icon } from './icons';
 import { favorites, type Mode } from './store';
-import { copyButton, copyText } from './results';
+import { copyButton, copyText, resultsBar } from './results';
 
 const MODE_LABEL: Record<Mode, string> = { string: '文字列', name: '名前', word: '単語', yonkoma: '4コマ' };
 
 export function favoritesView(): HTMLElement {
-  const root = h('section', { class: 'panel output favorites' });
+  const root = h('section', { class: 'output favorites' });
   const render = () => {
     const list = favorites.list();
     if (list.length === 0) {
-      root.replaceChildren(h('p', { class: 'empty' }, 'まだお気に入りはありません。結果の ☆ を押すとここに保存されます。'));
+      root.replaceChildren(h('p', { class: 'empty washi' }, 'まだ保存した名札はありません。名札の「保存」を押すとここに残ります。'));
       return;
     }
     root.replaceChildren(
-      h(
-        'div',
-        { class: 'results-head' },
-        h('span', { class: 'muted' }, `${list.length}件（このブラウザに保存）`),
+      resultsBar(
+        '保存した名札',
+        `${list.length}件（このブラウザに保存）`,
+        h('button', { type: 'button', class: 'piece small', onclick: () => copyText(list.map((f) => f.text).join('\n\n')) }, icon('copy', 14), 'すべてコピー'),
         h(
-          'div',
-          { class: 'result-actions' },
-          h('button', { type: 'button', class: 'ghost', onclick: () => copyText(list.map((f) => f.text).join('\n\n')) }, 'すべてコピー'),
-          h(
-            'button',
-            {
-              type: 'button',
-              class: 'ghost danger',
-              onclick: () => {
-                if (confirm('お気に入りをすべて削除しますか？')) favorites.clear();
-              },
+          'button',
+          {
+            type: 'button',
+            class: 'piece small danger',
+            onclick: () => {
+              if (confirm('保存した名札をすべて削除しますか？')) favorites.clear();
             },
-            'すべて削除',
-          ),
+          },
+          icon('trash', 14),
+          'すべて削除',
         ),
       ),
       h(
         'ul',
-        { class: 'results' },
+        { class: 'plates' },
         list.map((f) =>
           h(
             'li',
-            {},
+            { class: `plate-wrap${f.mode === 'yonkoma' ? ' wide' : ''}` },
+            h('span', { class: 'nail', 'aria-hidden': 'true' }),
+            h('span', { class: 'cord', 'aria-hidden': 'true' }),
             h(
               'div',
-              { class: 'result-text' },
+              { class: 'plate wood-hinoki' },
               h('span', { class: 'tag' }, MODE_LABEL[f.mode]),
-              h('span', { class: `main${f.mode === 'yonkoma' ? ' pre' : ''}` }, f.text),
-              f.sub ? h('span', { class: 'sub' }, f.sub) : null,
-            ),
-            h(
-              'div',
-              { class: 'result-actions' },
-              copyButton(() => f.text),
-              h('button', { type: 'button', class: 'icon-btn', title: '削除', 'aria-label': '削除', onclick: () => favorites.remove(f.text) }, '✕'),
+              f.sub ? h('span', { class: 'reading' }, f.sub) : null,
+              h('span', { class: `name${f.mode === 'yonkoma' ? ' pre' : [...f.text].length > 10 ? ' long' : ''}` }, f.text),
+              h(
+                'div',
+                { class: 'plate-actions' },
+                copyButton(() => f.text),
+                h('button', { type: 'button', class: 'tool', onclick: () => favorites.remove(f.text) }, icon('trash', 14), '削除'),
+              ),
             ),
           ),
         ),
