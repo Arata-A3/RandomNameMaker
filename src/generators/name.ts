@@ -70,21 +70,51 @@ function model(culture: string, kind: 'male' | 'female' | 'family'): MarkovModel
 
 const useReal = (rng: Rng, source: NameSource) => source === 'real' || (source === 'mixed' && rng.chance(0.5));
 
-/** "た/だ" のような読みから、連濁したほうを確率で選ぶ */
-function tailReading(rng: Rng, e: Entry): string {
-  const [plain, voiced] = e.reading.split('/');
-  return voiced && rng.chance(0.4) ? voiced : plain;
+/**
+ * "た/だ" のような読みから、連濁したほうを確率で選ぶ。
+ * 前半が「ん」で終わるときは濁りやすい（近藤 こんどう、本田 ほんだ）。
+ */
+function tailReading(rng: Rng, head: Entry, tail: Entry): string {
+  const [plain, voiced] = tail.reading.split('/');
+  if (!voiced) return plain;
+  const p = head.reading.endsWith('ん') ? Math.min(1, tail.voicing + 0.3) : tail.voicing;
+  return rng.chance(p) ? voiced : plain;
 }
+
+/** モーラ数（小さい ゃゅょ は前の音とまとめて数える） */
+export function moraCount(kana: string): number {
+  return [...kana.replace(/[ゃゅょぁぃぅぇぉ]/g, '')].length;
+}
+
+const byWeight = (e: Entry) => e.weight;
 
 function japanFamily(rng: Rng, source: NameSource): Piece {
   if (useReal(rng, source)) {
     const e = rng.pick(JP.JP_FAMILY_REAL);
     return { text: e.text, reading: e.reading };
   }
-  const head = rng.pick(JP.JP_FAMILY_HEAD);
-  const tail = rng.pick(JP.JP_FAMILY_TAIL.filter((t) => t.text !== head.text));
-  return { text: head.text + tail.text, reading: head.reading + tailReading(rng, tail) };
+  const head = rng.weighted(JP.JP_FAMILY_HEAD, byWeight);
+  const tail = rng.weighted(
+    JP.JP_FAMILY_TAIL.filter((t) => t.text !== head.text),
+    byWeight,
+  );
+  return { text: head.text + tail.text, reading: head.reading + tailReading(rng, head, tail) };
 }
+
+/** 名前の前半と後半の読みが自然につながるか */
+export function joinsWell(head: string, tail: string): boolean {
+  const last = head[head.length - 1];
+  // 同じ音が続く（ゆきき、かなな）
+  if (last === tail[0]) return false;
+  // 「いち」は ん・う の後だけ（けんいち、ゆういち）
+  if (tail === 'いち') return last === 'ん' || last === 'う';
+  // 母音で始まる後半は、伸ばす音の後に付けない（ゆうお、こうあ）
+  if (/^[あいうえお]/.test(tail) && /[うい]$/.test(head)) return false;
+  return true;
+}
+
+/** 下の名前のモーラ数の範囲（男性: 3〜4、女性: 2〜3） */
+const GIVEN_MORA: Record<'male' | 'female', [number, number]> = { male: [3, 4], female: [2, 3] };
 
 function japanGiven(rng: Rng, source: NameSource, g: 'male' | 'female'): Piece {
   if (useReal(rng, source)) {
@@ -92,10 +122,20 @@ function japanGiven(rng: Rng, source: NameSource, g: 'male' | 'female'): Piece {
     return { text: e.text, reading: e.reading };
   }
   const want = g === 'male' ? 'm' : 'f';
-  const head = rng.pick(JP.JP_GIVEN_HEAD.filter((h) => h.g === want || h.g === 'u'));
-  const tails = (g === 'male' ? JP.JP_GIVEN_TAIL_MALE : JP.JP_GIVEN_TAIL_FEMALE).filter((t) => t.text !== head.text);
-  const tail = rng.pick(tails);
-  return { text: head.text + tail.text, reading: head.reading + tail.reading };
+  const heads = JP.JP_GIVEN_HEAD.filter((h) => h.g === want || h.g === 'u');
+  const tails = g === 'male' ? JP.JP_GIVEN_TAIL_MALE : JP.JP_GIVEN_TAIL_FEMALE;
+  const [min, max] = GIVEN_MORA[g];
+  let piece: Piece = { text: '', reading: '' };
+  // 短すぎる・長すぎる読みや、同じ漢字の重なりは引き直す
+  for (let t = 0; t < 30; t++) {
+    const head = rng.pick(heads);
+    const tail = rng.pick(tails);
+    const reading = head.reading + tail.reading;
+    piece = { text: head.text + tail.text, reading };
+    const n = moraCount(reading);
+    if (head.text !== tail.text && n >= min && n <= max && joinsWell(head.reading, tail.reading)) break;
+  }
+  return piece;
 }
 
 function chineseFamily(rng: Rng): Piece {

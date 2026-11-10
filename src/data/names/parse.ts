@@ -1,7 +1,11 @@
-/** "表記:読み 表記:読み" 形式の文字列を配列にする */
+/** "表記:読み:重み:確率" 形式の文字列を配列にする（重み以降は省略可） */
 export interface Entry {
   text: string;
   reading: string;
+  /** 出やすさ（省略時 1） */
+  weight: number;
+  /** 苗字の後半パーツで、連濁した読みになる確率 */
+  voicing: number;
 }
 
 export function entries(src: string): Entry[] {
@@ -9,8 +13,8 @@ export function entries(src: string): Entry[] {
     .trim()
     .split(/\s+/)
     .map((tok) => {
-      const [text, reading = ''] = tok.split(':');
-      return { text, reading };
+      const [text, reading = '', weight = '1', voicing = '0'] = tok.split(':');
+      return { text, reading, weight: Number(weight), voicing: Number(voicing) };
     });
 }
 

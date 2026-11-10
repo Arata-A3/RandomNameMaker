@@ -52,3 +52,25 @@ describe('generateNames', () => {
     for (const r of out) expect(r.text).not.toContain(' ');
   });
 });
+
+describe('日本の名前の組み立て', () => {
+  it('読みのつながりが不自然なものは避ける', async () => {
+    const { joinsWell } = await import('../src/generators/name');
+    expect(joinsWell('ゆき', 'き')).toBe(false);
+    expect(joinsWell('ゆう', 'お')).toBe(false);
+    expect(joinsWell('あき', 'いち')).toBe(false);
+    expect(joinsWell('けん', 'いち')).toBe(true);
+    expect(joinsWell('はる', 'と')).toBe(true);
+  });
+
+  it('作った名前は男性3〜4音・女性2〜3音', async () => {
+    const { moraCount } = await import('../src/generators/name');
+    for (const [gender, min, max] of [['male', 3, 4], ['female', 2, 3]] as const) {
+      const out = generateNames({ culture: 'japan', part: 'given', gender, source: 'generated', count: 100, seed: gender });
+      for (const r of out) {
+        expect(moraCount(r.reading!)).toBeGreaterThanOrEqual(min);
+        expect(moraCount(r.reading!)).toBeLessThanOrEqual(max);
+      }
+    }
+  });
+});
