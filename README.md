@@ -46,5 +46,5 @@ tests/
 - [x] 名前モード（国風データ・マルコフ連鎖）（`generators/name.ts` `data/names/`）
 - [x] 単語モード（`generators/word.ts` `data/words.ts`）
 - [x] 4コマネタモード（`generators/yonkoma.ts` `data/yonkoma.ts`）
-- [ ] UI・コピー・お気に入り
-- [ ] テスト
+- [x] UI・コピー・お気に入り（`src/ui/`）
+- [x] テスト（`tests/`、`npm test`）
