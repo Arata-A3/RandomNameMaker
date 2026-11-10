@@ -39,9 +39,9 @@ export function logo(size = 44): HTMLSpanElement {
 <linearGradient id="logo-left" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D19C5F"/><stop offset="1" stop-color="#B9854B"/></linearGradient>
 <linearGradient id="logo-right" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9733D"/><stop offset="1" stop-color="#875628"/></linearGradient>
 </defs>
-<path d="M26 47 L80 20 L134 47 L80 74 Z" fill="url(#logo-top)" stroke="url(#logo-top)" stroke-width="6" stroke-linejoin="round"/>
-<path d="M26 47 L80 74 L80 134 L26 107 Z" fill="url(#logo-left)" stroke="url(#logo-left)" stroke-width="6" stroke-linejoin="round"/>
-<path d="M80 74 L134 47 L134 107 L80 134 Z" fill="url(#logo-right)" stroke="url(#logo-right)" stroke-width="6" stroke-linejoin="round"/>
+<path d="M26 47 L80 20 L134 47 L80 74 Z" fill="url(#logo-top)"/>
+<path d="M26 47 L80 74 L80 134 L26 107 Z" fill="url(#logo-left)"/>
+<path d="M80 74 L134 47 L134 107 L80 134 Z" fill="url(#logo-right)"/>
 <path d="M26 47 L80 74 L134 47" fill="none" stroke="#FFEACB" stroke-width="2.5" stroke-linejoin="round" opacity="0.8"/>
 <g transform="matrix(0.54 -0.27 0.54 0.27 26 47)"><circle cx="50" cy="50" r="17" fill="#8E2A18"/><circle cx="50" cy="50" r="14.5" fill="#C2452D"/></g>
 <g transform="matrix(0.54 0.27 0 0.6 26 47)"><text x="50" y="69" text-anchor="middle" font-family="'Zen Kaku Gothic New', 'Yu Gothic', sans-serif" font-weight="700" font-size="54" fill="#3B2414">あ</text></g>

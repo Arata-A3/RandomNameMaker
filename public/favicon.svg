@@ -3,9 +3,9 @@
     <linearGradient id="tile" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#6A4429"/><stop offset="1" stop-color="#36210F"/></linearGradient>
   </defs>
   <rect width="160" height="160" rx="36" fill="url(#tile)"/>
-  <path d="M26 47 L80 20 L134 47 L80 74 Z" fill="#F0D19F" stroke="#F0D19F" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M26 47 L80 74 L80 134 L26 107 Z" fill="#C99456" stroke="#C99456" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M80 74 L134 47 L134 107 L80 134 Z" fill="#94622F" stroke="#94622F" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M26 47 L80 20 L134 47 L80 74 Z" fill="#F0D19F"/>
+  <path d="M26 47 L80 74 L80 134 L26 107 Z" fill="#C99456"/>
+  <path d="M80 74 L134 47 L134 107 L80 134 Z" fill="#94622F"/>
   <g transform="matrix(0.54 -0.27 0.54 0.27 26 47)"><circle cx="50" cy="50" r="22" fill="#C2452D"/></g>
   <g transform="matrix(0.54 -0.27 0 0.6 80 74)" fill="#2B1A0C"><circle cx="28" cy="28" r="13"/><circle cx="72" cy="72" r="13"/></g>
 </svg>
