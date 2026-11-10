@@ -44,7 +44,7 @@ tests/
 - [x] プロジェクトの土台、シード付き乱数（`src/core/random.ts`）、かなのモーラ表（`src/core/kana.ts`）
 - [x] 文字種・発音ルール・文字列モード（`charset.ts` `pronounce.ts` `generators/string.ts`）
 - [x] 名前モード（国風データ・マルコフ連鎖）（`generators/name.ts` `data/names/`）
-- [ ] 単語モード
+- [x] 単語モード（`generators/word.ts` `data/words.ts`）
 - [ ] 4コマネタモード
 - [ ] UI・コピー・お気に入り
 - [ ] テスト
